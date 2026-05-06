@@ -1,0 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    html, body, #app {
+        @apply h-full;
+    }
+    body {
+        @apply bg-[#0e1117] text-slate-200 antialiased text-sm;
+        font-family: 'IBM Plex Sans', sans-serif;
+    }
+}
