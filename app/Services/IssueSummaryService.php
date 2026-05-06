@@ -39,34 +39,31 @@ class IssueSummaryService
     private function generateViaAI(string $title, string $description, string $priority, string $category): array
     {
         $prompt = <<<PROMPT
-You are a support operations assistant. Given the issue below, return a JSON object with exactly two keys:
-- "summary": a single sentence (max 30 words) capturing what the issue is about
-- "suggested_action": a single concrete next step the team should take (max 25 words)
+    You are a support operations assistant. Given the issue below, return a JSON object with exactly two keys:
+    - "summary": a single sentence (max 30 words) capturing what the issue is about
+    - "suggested_action": a single concrete next step the team should take (max 25 words)
 
-Issue:
-Title: {$title}
-Category: {$category}
-Priority: {$priority}
-Description: {$description}
+    Issue:
+    Title: {$title}
+    Category: {$category}
+    Priority: {$priority}
+    Description: {$description}
 
-Respond ONLY with raw JSON. No markdown, no explanation.
-PROMPT;
+    Respond ONLY with raw JSON. No markdown, no explanation.
+    PROMPT;
 
-        $response = Http::withHeaders([
-            'x-api-key'         => $this->apiKey,
-            'anthropic-version' => '2023-06-01',
-            'content-type'      => 'application/json',
-        ])->post('https://api.anthropic.com/v1/messages', [
-            'model'      => $this->model,
-            'max_tokens' => 256,
-            'messages'   => [['role' => 'user', 'content' => $prompt]],
+        $response = Http::post("{$this->endpoint}?key={$this->apiKey}", [
+            'contents' => [
+                ['parts' => [['text' => $prompt]]]
+            ],
         ])->throw()->json();
 
-        $text   = $response['content'][0]['text'] ?? '';
-        $parsed = json_decode($text, true);
+        $text   = $response['candidates'][0]['content']['parts'][0]['text'] ?? '';
+        $text   = preg_replace('/```json|```/', '', $text);
+        $parsed = json_decode(trim($text), true);
 
-        if (! is_array($parsed) || empty($parsed['summary']) || empty($parsed['suggested_action'])) {
-            throw new \RuntimeException('Unexpected AI response shape.');
+        if (!is_array($parsed) || empty($parsed['summary']) || empty($parsed['suggested_action'])) {
+            throw new \RuntimeException('Unexpected Gemini response shape.');
         }
 
         return [

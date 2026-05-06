@@ -41,10 +41,10 @@ DB_USERNAME=root
 DB_PASSWORD=
 ```
 
-Optionally, add your Anthropic API key to enable AI summaries:
+Optionally, add your Gemini API key to enable AI summaries:
 
 ```env
-ANTHROPIC_API_KEY=sk-ant-...
+GEMINI_API_KEY=AIzaSyBgJolbgPB0Wbfqtv0TirNe3Uxa0rgRhe4
 ```
 
 > Without this key the system falls back to deterministic rules-based summaries automatically.
