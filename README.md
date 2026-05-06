@@ -1,6 +1,6 @@
 # IssueOps — Issue Intake & Smart Summary System
 
-A production-grade issue tracking system built with **Laravel 12** (backend/API) and **React 18** (frontend SPA), featuring AI-powered summaries via the Claude API with automatic rules-based fallback.
+A production-grade issue tracking system built with **Laravel 12** (backend/API) and **React 18** (frontend SPA), featuring AI-powered summaries via the Gemini API with automatic rules-based fallback.
 
 ---
 
@@ -215,6 +215,6 @@ valet restart
 |---|---|
 | **Backend** | Laravel 12 · REST API · Form Request validation · Service layer |
 | **Frontend** | React 18 SPA · Vite · Tailwind CSS v3 |
-| **AI Service** | Claude API (`claude-sonnet-4-20250514`) · deterministic rules-based fallback |
+| **AI Service** | Gemini API |
 | **Escalation** | Re-evaluated on every create and update to keep flags current |
 | **Database** | MySQL recommended for local parity with production; SQLite supported |

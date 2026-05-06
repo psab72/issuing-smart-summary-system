@@ -4,7 +4,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Anthropic Claude API
+    | Google Gemini API
     |--------------------------------------------------------------------------
     |
     | Set ANTHROPIC_API_KEY in your .env to enable AI-generated summaries.
