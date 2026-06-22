@@ -1,4 +1,4 @@
-const TOKEN_KEY = 'issueops_token';
+const TOKEN_KEY = "issueops_token";
 
 export function setToken(token) {
     localStorage.setItem(TOKEN_KEY, token);

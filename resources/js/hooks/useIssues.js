@@ -1,12 +1,12 @@
 // resources/js/hooks/useIssues.js
-import { useState, useEffect, useCallback } from 'react';
-import { api } from '../lib/api';
+import { useState, useEffect, useCallback } from "react";
+import { api } from "../lib/api";
 
 export function useIssues(filters) {
     const [issues, setIssues] = useState([]);
-    const [meta, setMeta]     = useState(null);
+    const [meta, setMeta] = useState(null);
     const [loading, setLoading] = useState(Boolean(filters));
-    const [error, setError]   = useState(null);
+    const [error, setError] = useState(null);
 
     const load = useCallback(async () => {
         if (!filters) {
@@ -30,13 +30,15 @@ export function useIssues(filters) {
         }
     }, [filters ? JSON.stringify(filters) : null]);
 
-    useEffect(() => { load(); }, [load]);
+    useEffect(() => {
+        load();
+    }, [load]);
 
     return { issues, meta, loading, error, reload: load };
 }
 
 export function useStats() {
-    const [stats, setStats]   = useState(null);
+    const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
