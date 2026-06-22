@@ -5,10 +5,18 @@ import { api } from '../lib/api';
 export function useIssues(filters) {
     const [issues, setIssues] = useState([]);
     const [meta, setMeta]     = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(Boolean(filters));
     const [error, setError]   = useState(null);
 
     const load = useCallback(async () => {
+        if (!filters) {
+            setIssues([]);
+            setMeta(null);
+            setLoading(false);
+            setError(null);
+            return;
+        }
+
         setLoading(true);
         setError(null);
         try {
@@ -20,7 +28,7 @@ export function useIssues(filters) {
         } finally {
             setLoading(false);
         }
-    }, [JSON.stringify(filters)]);
+    }, [filters ? JSON.stringify(filters) : null]);
 
     useEffect(() => { load(); }, [load]);
 

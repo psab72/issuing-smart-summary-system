@@ -1,19 +1,61 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import IssueList   from './components/IssueList';
 import IssueForm   from './components/IssueForm';
 import IssueDetail from './components/IssueDetail';
 import Dashboard   from './components/Dashboard';
 import FilterBar   from './components/FilterBar';
+import LoginPage   from './components/LoginPage';
 import { useIssues } from './hooks/useIssues';
 import { api } from './lib/api';
+import { setToken, clearToken, getToken } from './lib/auth';
 
 export default function App() {
     const [view, setView]         = useState('list');
     const [selected, setSelected] = useState(null);
     const [filters, setFilters]   = useState({ status: '', priority: '', category: '', search: '' });
     const [toast, setToast]       = useState(null);
+    const [user, setUser]         = useState(null);
+    const [authLoading, setAuthLoading] = useState(true);
 
-    const { issues, meta, loading, error, reload } = useIssues(filters);
+    const { issues, meta, loading, error, reload } = useIssues(user ? filters : null);
+
+    useEffect(() => {
+        const token = getToken();
+
+        if (!token) {
+            setAuthLoading(false);
+            return;
+        }
+
+        api.me()
+            .then((response) => {
+                setUser(response);
+            })
+            .catch(() => {
+                clearToken();
+            })
+            .finally(() => {
+                setAuthLoading(false);
+            });
+    }, []);
+
+    const handleLogin = async ({ email, password }) => {
+        const response = await api.login({ email, password });
+        setToken(response.token);
+        setUser(response.user);
+        setView('dashboard');
+    };
+
+    const handleLogout = async () => {
+        try {
+            await api.logout();
+        } catch (error) {
+            // ignore logout errors but still clear local session
+        }
+        clearToken();
+        setUser(null);
+        setView('list');
+    };
 
     const showToast = (msg, type = 'success') => {
         setToast({ msg, type });
@@ -62,6 +104,21 @@ export default function App() {
         error:   'bg-red-900 border border-red-500 text-red-300',
     };
 
+    if (authLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-[#0f172a] text-slate-400">
+                <div className="text-center">
+                    <div className="mb-4 h-12 w-12 rounded-full border-4 border-blue-500/20 border-t-blue-400 animate-spin" />
+                    <p className="text-sm">Checking authentication…</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (!user) {
+        return <LoginPage onLogin={handleLogin} />;
+    }
+
     return (
         <div className="flex h-screen overflow-hidden">
             {/* Sidebar */}
@@ -95,6 +152,20 @@ export default function App() {
 
             {/* Main */}
             <main className="flex-1 overflow-y-auto p-7 relative">
+                <div className="flex items-center justify-between mb-6 gap-4">
+                    <div>
+                        <h2 className="text-sm uppercase tracking-[0.35em] text-slate-500">Welcome back,</h2>
+                        <p className="text-lg font-semibold text-slate-100">{user.name || user.email}</p>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="rounded-2xl border border-slate-800 bg-slate-950/80 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-red-500 hover:text-red-300"
+                    >
+                        Log out
+                    </button>
+                </div>
+
                 {/* Toast */}
                 {toast && (
                     <div className={`fixed top-5 right-6 z-50 px-4 py-2.5 rounded-md text-[13.5px] font-medium animate-fade-in ${toastColors[toast.type]}`}>
